@@ -7,41 +7,52 @@
 
 using namespace std;
 
-//Representaciones ASCII 
-const vector<string> NAVE_ASCII = {
-    "▲",  
-    "►", 
-    "▼", 
-    "◄" 
-};
+// Definimos las representaciones ASCII de la nave en diferentes ángulos usando std::string
+const vector<string> NAVE_ASCII = {"▲", "►", "▼", "◄"};
 
-// Definir la estructura Nave
+// Tamaño de la pantalla (matriz)
+const int FILAS = 20;
+const int COLUMNAS = 40;
+
+// Definimos la estructura Nave, que contiene la información de la nave
 struct Nave {
-    int x, y;    // Posición de la nave
-    int direccion; 
-    atomic<bool> running; // Variable para controlar el hilo
-
-    // Constructor para inicializar la estructura con valores
-    Nave(int posX, int posY, int dir)
-        : x(posX), y(posY), direccion(dir), running(true) {}
+    int x, y;           // Posición de la nave
+    int direccion;     
+    atomic<bool> running; // Controla si el hilo sigue en ejecución
 };
 
-// Función para obtener la entrada de teclado
+// Creamos la pantalla como una matriz
+vector<vector<char>> pantalla(FILAS, vector<char>(COLUMNAS, ' '));
+
+// Función para obtener la entrada de teclado sin esperar "Enter"
 int getch() {
     struct termios oldt, newt;
     tcgetattr(STDIN_FILENO, &oldt);
     newt = oldt;
-    newt.c_lflag &= ~(ICANON | ECHO); // Desactivar el modo canónico y eco
+    newt.c_lflag &= ~(ICANON | ECHO); // Desactivar modo canónico y eco
     tcsetattr(STDIN_FILENO, TCSANOW, &newt);
     int ch = getchar();
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
     return ch;
 }
 
-void dibujarNave(const Nave& nave) {
-    system("clear"); // Limpiar la pantalla
-    cout << "\033[" << nave.y << ";" << nave.x << "H" << NAVE_ASCII[nave.direccion];  // Dibujar la nave
-    cout.flush();
+// Función para dibujar la pantalla
+void dibujarPantalla(const Nave& nave) {
+    system("clear");  // Limpiar la pantalla
+
+    // Dibujar la nave en la posición actual dentro de la matriz
+    pantalla[nave.y][nave.x] = NAVE_ASCII[nave.direccion][0];  // Solo tomamos el primer carácter de la string
+
+    // Mostrar la pantalla
+    for (int i = 0; i < FILAS; ++i) {
+        for (int j = 0; j < COLUMNAS; ++j) {
+            cout << pantalla[i][j];
+        }
+        cout << endl;
+    }
+
+    // Limpiar la posición de la nave para la siguiente iteración
+    pantalla[nave.y][nave.x] = ' ';
 }
 
 // Función para mover la nave según el input del usuario
@@ -49,40 +60,56 @@ void moverNave(Nave& nave, char input) {
     switch (input) {
         case 'w': // Avanzar en la dirección actual
             switch (nave.direccion) {
-                case 0: nave.y -= 1; break;  // Mover hacia arriba
-                case 1: nave.x += 1; break;  // Mover hacia la derecha
-                case 2: nave.y += 1; break;  // Mover hacia abajo
-                case 3: nave.x -= 1; break;  // Mover hacia la izquierda
+                case 0: // Mover hacia arriba
+                    if (nave.y > 0) nave.y -= 1;
+                    break;
+                case 1: // Mover hacia la derecha
+                    if (nave.x < COLUMNAS - 1) nave.x += 1;
+                    break;
+                case 2: // Mover hacia abajo
+                    if (nave.y < FILAS - 1) nave.y += 1;
+                    break;
+                case 3: // Mover hacia la izquierda
+                    if (nave.x > 0) nave.x -= 1;
+                    break;
             }
             break;
         case 'a': // Girar antihorario
-            nave.direccion = (nave.direccion + 3) % 4; 
+            nave.direccion = (nave.direccion + 3) % 4;  
             break;
         case 'd': // Girar horario
-            nave.direccion = (nave.direccion + 1) % 4;
+            nave.direccion = (nave.direccion + 1) % 4; 
             break;
     }
 }
 
-//Lo que hara el hilo de la nave
+// Subrutina para ejecutar la lógica de la nave en el hilo
 void* ejecutarNave(void* arg) {
     Nave* nave = (Nave*)arg;
 
     while (nave->running) {
-        dibujarNave(*nave);
-        char input = getch(); // Obtener entrada de teclado
-        moverNave(*nave, input);
-        if (input == 'q') { // Salir si se presiona 'q'
+        dibujarPantalla(*nave);  // Dibujar la nave y la pantalla
+        char input = getch();    // Capturar entrada de teclado
+        moverNave(*nave, input); // Mover la nave según la entrada
+
+        // Detener si se presiona 'q'
+        if (input == 'q') {
             nave->running = false;
         }
-        usleep(50000); // Esperar un tiempo antes de redibujar
+
+        usleep(50000);  // Esperar un tiempo antes de redibujar
     }
+
     return nullptr;
 }
 
 int main() {
-    // Inicializamos la estructura Nave
-    Nave nave = {10, 10, 0};
+    // Inicializamos la estructura Nave por partes
+    Nave nave;
+    nave.x = COLUMNAS / 2;   // Posicionar en el centro de la pantalla (eje x)
+    nave.y = FILAS / 2;      // Posicionar en el centro de la pantalla (eje y)
+    nave.direccion = 0;      // Dirección inicial (arriba)
+    nave.running = true;     // Estado de ejecución
 
     // Crear el hilo para la nave
     pthread_t hiloNave;
