@@ -14,7 +14,9 @@ struct Nave {
     int direccion;     
     bool running;  // Cambiado de atomic<bool> a bool
 
-    Nave(int x, int y);
+    int vidas;// vidas, pata logica de colision
+
+    Nave(int x, int y, int vidasIniciales);
 };
 
 int getch();

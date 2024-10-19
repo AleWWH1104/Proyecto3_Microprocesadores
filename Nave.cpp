@@ -9,7 +9,8 @@
 using namespace std;  // Añadir aquí
 
 // Constructor para Nave
-Nave::Nave(int x, int y) : x(x), y(y), direccion(0), running(true) {}
+Nave::Nave(int x, int y, int vidasIniciales) 
+    : x(x), y(y), direccion(0), running(true), vidas(vidasIniciales) {}
 
 int getch() {
     struct termios oldt, newt;
