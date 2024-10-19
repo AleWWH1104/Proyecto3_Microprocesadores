@@ -7,6 +7,8 @@
 #include "Nave.h"      // Incluir la cabecera de Nave
 #include "Asteroid.h"  // Incluir la cabecera de Asteroid
 
+#include "Colision.h"
+
 using namespace std;
 
 // Tamaño de la pantalla
@@ -27,7 +29,7 @@ void limpiarPantalla() {
 int main() {
     srand(static_cast<unsigned int>(time(0))); // Semilla para aleatoriedad
 
-    Nave nave(columnas / 2, filas / 2); // Crear la nave en el centro de la pantalla
+    Nave nave(columnas / 2, filas / 2, 3); // Crear la nave en el centro de la pantalla con 3 vidas
     vector<Asteroide> asteroides; // Vector para almacenar los asteroides
 
     // Inicializar algunos asteroides
@@ -48,8 +50,13 @@ int main() {
     // Bucle principal del juego
     while (nave.running) {
         limpiarPantalla(); // Limpiar la pantalla
-        dibujarPantallaNave(nave, pantalla); // Dibujar la nave
-        dibujarPantallaAsteroides(asteroides, pantalla); // Dibujar asteroides
+        
+        // Dibujar la nave y los asteroides
+        dibujarPantallaNave(nave, pantalla); 
+        dibujarPantallaAsteroides(asteroides, pantalla); 
+
+        // Verificar colisiones entre la nave y los asteroides
+        detectarColisionesNaveAsteroides(nave, asteroides);
 
         // Mostrar la pantalla en la consola
         for (const auto& fila : pantalla) {
