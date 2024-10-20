@@ -1,10 +1,8 @@
-// Nave.cpp
 #include "Nave.h"
 #include <iostream>
 #include <pthread.h>
-#include <unistd.h>
-#include <termios.h>
-#include <atomic>
+#include <unistd.h>  // Para usar usleep() (esta parte funcionará en Windows si usas MinGW o Cygwin)
+#include <conio.h>   // Para capturar entrada sin esperar salto de línea
 
 using namespace std;  // Añadir aquí
 
@@ -12,17 +10,7 @@ using namespace std;  // Añadir aquí
 Nave::Nave(int x, int y, int vidasIniciales) 
     : x(x), y(y), direccion(0), running(true), vidas(vidasIniciales) {}
 
-int getch() {
-    struct termios oldt, newt;
-    tcgetattr(STDIN_FILENO, &oldt);
-    newt = oldt;
-    newt.c_lflag &= ~(ICANON | ECHO);
-    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-    int ch = getchar();
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-    return ch;
-}
-
+// Función para capturar la entrada del usuario sin esperar un Enter (ya incluida con conio.h)
 void moverNave(Nave& nave, char input) {
     switch (input) {
         case 'w': // Avanzar en la dirección actual
@@ -33,8 +21,8 @@ void moverNave(Nave& nave, char input) {
                 case 3: if (nave.x > 0) nave.x -= 1; break;
             }
             break;
-        case 'a': nave.direccion = (nave.direccion + 3) % 4; break; // Gira antihorario
-        case 'd': nave.direccion = (nave.direccion + 1) % 4; break; // Gira horario
+        case 'a': nave.direccion = (nave.direccion + 3) % 4; break;
+        case 'd': nave.direccion = (nave.direccion + 1) % 4; break;
     }
 }
 
@@ -42,8 +30,8 @@ void* ejecutarNave(void* arg) {
     Nave* nave = (Nave*)arg;
 
     while (nave->running) {
-        char input = getch();    
-        moverNave(*nave, input); 
+        char input = getch();  // Captura la tecla ingresada  
+        moverNave(*nave, input);
 
         if (input == 'q') {
             nave->running = false;
