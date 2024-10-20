@@ -19,7 +19,6 @@ struct Nave {
     Nave(int x, int y, int vidasIniciales);
 };
 
-int getch();
 void moverNave(Nave& nave, char input);
 void* ejecutarNave(void* arg);
 void dibujarPantallaNave(const Nave& nave, vector<vector<char>>& pantalla);
