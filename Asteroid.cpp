@@ -31,7 +31,7 @@ void* ejecutarAsteroide(void* arg) {
     
     while (asteroide->activo) {
         moverAsteroide(*asteroide, pantalla);  // Pasar la pantalla
-        usleep(200000);
+        usleep(2000);
     }
 
     return nullptr;

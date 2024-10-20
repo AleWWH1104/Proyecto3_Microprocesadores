@@ -66,7 +66,7 @@ int main() {
             cout << endl; // Nueva línea después de cada fila
         }
 
-        usleep(100000); // Pausa para controlar la velocidad del juego
+        usleep(1000); // Pausa para controlar la velocidad del juego
     }
 
     // Esperar a que los hilos terminen

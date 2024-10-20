@@ -37,7 +37,7 @@ void* ejecutarNave(void* arg) {
             nave->running = false;
         }
 
-        usleep(50000);
+        usleep(500);
     }
 
     return nullptr;
