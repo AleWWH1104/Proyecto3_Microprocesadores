@@ -19,6 +19,8 @@ const int columnas = 40;  // Número de columnas
 // Pantalla donde se dibujan la nave y los asteroides
 vector<vector<char>> pantalla(filas, vector<char>(columnas, ' '));
 
+vector<Asteroide> asteroides; // Declara el vector de asteroides
+
 // Función para limpiar la pantalla
 void limpiarPantalla() {
     for (auto& fila : pantalla) {
@@ -67,6 +69,11 @@ void dibujarProyectiles(const vector<Proyectil>& proyectiles, vector<vector<char
     }
 }
 
+int cantAsteroidesc = asteroides.size() * 2; // Usa el tamaño del vector
+
+
+
+
 
 
 // Función principal del juego
@@ -75,7 +82,7 @@ int main() {
 
     Nave nave(columnas / 2, filas / 2, 3); // Crear la nave en el centro de la pantalla con 3 vidas
     vector<Asteroide> asteroides; // Vector para almacenar los asteroides
-    vector<Proyectil> proyectiles;
+    vector<Asteroidec> asteroidesc;
 
     // Inicializar algunos asteroides
     for (int i = 0; i < 5; ++i) {
@@ -91,6 +98,13 @@ int main() {
     for (size_t i = 0; i < asteroides.size(); ++i) {
         pthread_create(&hilosAsteroides[i], nullptr, ejecutarAsteroide, (void*)&asteroides[i]);
     }
+
+    // Crear hilos para los asteroides pequeños
+    vector<pthread_t> hilosAsteroidesc(cantAsteroidesc);
+    for (size_t i = 0; i < cantAsteroidesc; ++i) {
+        pthread_create(&hilosAsteroidesc[i], nullptr, ejecutarAsteroidec, (void*)&asteroidesc[i]);
+    }
+
 
     // Bucle principal del juego
     while (nave.running) {
@@ -108,11 +122,15 @@ int main() {
         dibujarPantallaAsteroides(asteroides, pantalla);
         dibujarProyectiles(nave.proyectiles, pantalla); // Dibujar los proyectiles
 
+        dibujarPantallaAsteroidesc(asteroidesc, pantalla);
+
+
         // Verificar colisiones entre la nave y los asteroides
         detectarColisionesNaveAsteroides(nave, asteroides);
         
         
-        detectarColisionesProyectilAsteroides(nave, nave.proyectiles, asteroides);
+        detectarColisionesProyectilAsteroides(nave, nave.proyectiles, asteroides, asteroidesc, pantalla);
+
 
 
 
