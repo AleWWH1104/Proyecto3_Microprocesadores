@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <string>
+#include "Proyectil.h" 
 
 using namespace std; 
 
@@ -14,12 +15,12 @@ struct Nave {
     int direccion;     
     bool running;  // Cambiado de atomic<bool> a bool
 
+    int puntos;
     int vidas;// vidas, pata logica de colision
-
+    vector<Proyectil> proyectiles; // Almacenar los proyectiles
     Nave(int x, int y, int vidasIniciales);
 };
 
-int getch();
 void moverNave(Nave& nave, char input);
 void* ejecutarNave(void* arg);
 void dibujarPantallaNave(const Nave& nave, vector<vector<char>>& pantalla);

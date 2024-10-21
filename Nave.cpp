@@ -1,14 +1,17 @@
 #include "Nave.h"
+#include "Proyectil.h"
 #include <iostream>
 #include <pthread.h>
-#include <unistd.h>  // Para usar usleep() (esta parte funcionará en Windows si usas MinGW o Cygwin)
+#include <chrono>  //esta parte funcionará en Windows si usas MinGW o Cygwin
 #include <conio.h>   // Para capturar entrada sin esperar salto de línea
+#include <thread> 
+
 
 using namespace std;  // Añadir aquí
 
 // Constructor para Nave
 Nave::Nave(int x, int y, int vidasIniciales) 
-    : x(x), y(y), direccion(0), running(true), vidas(vidasIniciales) {}
+    : x(x), y(y), direccion(0), running(true), puntos(0), vidas(vidasIniciales) {}
 
 // Función para capturar la entrada del usuario sin esperar un Enter (ya incluida con conio.h)
 void moverNave(Nave& nave, char input) {
@@ -26,6 +29,10 @@ void moverNave(Nave& nave, char input) {
     }
 }
 
+void dispararProyectil(Nave& nave) {
+    nave.proyectiles.emplace_back(nave.x, nave.y, nave.direccion);
+}
+
 void* ejecutarNave(void* arg) {
     Nave* nave = (Nave*)arg;
 
@@ -37,7 +44,12 @@ void* ejecutarNave(void* arg) {
             nave->running = false;
         }
 
-        usleep(50000);
+        if (input == ' ') { // Espacio para disparar
+            dispararProyectil(*nave);
+        }
+
+        std::this_thread::sleep_for(std::chrono::microseconds(50000));
+
     }
 
     return nullptr;
