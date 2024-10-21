@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <string>
+#include "Proyectil.h" 
 
 using namespace std; 
 
@@ -15,7 +16,7 @@ struct Nave {
     bool running;  // Cambiado de atomic<bool> a bool
 
     int vidas;// vidas, pata logica de colision
-
+    vector<Proyectil> proyectiles; // Almacenar los proyectiles
     Nave(int x, int y, int vidasIniciales);
 };
 

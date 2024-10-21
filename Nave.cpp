@@ -1,4 +1,5 @@
 #include "Nave.h"
+#include "Proyectil.h"
 #include <iostream>
 #include <pthread.h>
 #include <chrono>  //esta parte funcionará en Windows si usas MinGW o Cygwin
@@ -28,6 +29,10 @@ void moverNave(Nave& nave, char input) {
     }
 }
 
+void dispararProyectil(Nave& nave) {
+    nave.proyectiles.emplace_back(nave.x, nave.y, nave.direccion);
+}
+
 void* ejecutarNave(void* arg) {
     Nave* nave = (Nave*)arg;
 
@@ -37,6 +42,10 @@ void* ejecutarNave(void* arg) {
 
         if (input == 'q') {
             nave->running = false;
+        }
+
+        if (input == ' ') { // Espacio para disparar
+            dispararProyectil(*nave);
         }
 
         std::this_thread::sleep_for(std::chrono::microseconds(50000));

@@ -40,6 +40,35 @@ void dibujarUI(const Nave& nave) {
     cout << string(40, '-') << endl; // Línea divisoria
 }
 
+void moverProyectiles(vector<Proyectil>& proyectiles) {
+    for (auto& proyectil : proyectiles) {  
+        if (proyectil.activo) {  
+            // Mover el proyectil en la dirección actual
+            switch (proyectil.direccion) {  // Asegúrate de que la dirección esté almacenada en el proyectil
+                case 0: proyectil.y -= 1; break; // Arriba
+                case 1: proyectil.x += 1; break; // Derecha
+                case 2: proyectil.y += 1; break; // Abajo
+                case 3: proyectil.x -= 1; break; // Izquierda
+            }
+
+            // Verificar si el proyectil sale de la pantalla
+            if (proyectil.y < 0 || proyectil.y >= filas || proyectil.x < 0 || proyectil.x >= columnas) {
+                proyectil.activo = false; // Desactivar si sale de la pantalla
+            }
+        }
+    }
+}
+
+void dibujarProyectiles(const vector<Proyectil>& proyectiles, vector<vector<char>>& pantalla) {
+    for (const auto& proyectil : proyectiles) {
+        if (proyectil.activo) {
+            pantalla[proyectil.y][proyectil.x] = '*'; // Representar el proyectil
+        }
+    }
+}
+
+
+
 // Función principal del juego
 int main() {
     srand(static_cast<unsigned int>(time(0))); // Semilla para aleatoriedad
@@ -63,30 +92,34 @@ int main() {
     }
 
     // Bucle principal del juego
-while (nave.running) {
-    borrar();
-    limpiarPantalla(); // Limpiar la pantalla
+    while (nave.running) {
+        borrar();
+        limpiarPantalla(); // Limpiar la pantalla
 
-    // Dibujar el UI
-    dibujarUI(nave);
+        // Dibujar el UI
+        dibujarUI(nave);
 
-    // Dibujar la nave y los asteroides
-    dibujarPantallaNave(nave, pantalla); 
-    dibujarPantallaAsteroides(asteroides, pantalla); 
+        // Mover proyectiles
+        moverProyectiles(nave.proyectiles);
+        
+        // Dibujar la nave y los asteroides
+        dibujarPantallaNave(nave, pantalla); 
+        dibujarPantallaAsteroides(asteroides, pantalla);
+        dibujarProyectiles(nave.proyectiles, pantalla); // Dibujar los proyectiles
 
-    // Verificar colisiones entre la nave y los asteroides
-    detectarColisionesNaveAsteroides(nave, asteroides);
+        // Verificar colisiones entre la nave y los asteroides
+        detectarColisionesNaveAsteroides(nave, asteroides);
 
-    // Mostrar la pantalla en la consola
-    for (const auto& fila : pantalla) {
-        for (char celda : fila) {
-            cout << celda; // Imprimir cada celda
+        // Mostrar la pantalla en la consola
+        for (const auto& fila : pantalla) {
+            for (char celda : fila) {
+                cout << celda; // Imprimir cada celda
+            }
+            cout << endl; // Nueva línea después de cada fila
         }
-        cout << endl; // Nueva línea después de cada fila
-    }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
-}
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    }
     // Esperar a que los hilos terminen
     pthread_join(hiloNave, nullptr);
     for (auto& hilo : hilosAsteroides) {
