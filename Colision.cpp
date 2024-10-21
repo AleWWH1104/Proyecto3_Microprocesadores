@@ -35,3 +35,26 @@ void detectarColisionesNaveAsteroides(Nave& nave, vector<Asteroide>& asteroides)
         }
     }
 }
+
+
+bool verificarColisionProyectilAsteroide(const Proyectil& proyectil, const Asteroide& asteroide) {
+    //la colision ocurre si las coordenadas del proyectil coinciden con las del asteroide
+    return (proyectil.x == asteroide.x && proyectil.y == asteroide.y);
+}
+
+
+void detectarColisionesProyectilAsteroides(Nave& nave, Proyectil& proyectil, vector<Asteroide>& asteroides) {
+    for (Asteroide& asteroide : asteroides) {
+        if (asteroide.activo && verificarColisionProyectilAsteroide(proyectil, asteroide)) {
+            cout << "Colision detectada entre la proyectil y un asteroide" << endl;
+            
+            // Restar una vida al jugador
+            nave.puntos =  nave.puntos + 100;
+
+            // Desactivar el asteroide (o realizar otra acción, como dividirlo si es grande)
+            asteroide.activo = false;
+
+            break;  // No es necesario seguir buscando otras colisiones en este ciclo
+        }
+    }
+}

@@ -15,6 +15,7 @@ struct Nave {
     int direccion;     
     bool running;  // Cambiado de atomic<bool> a bool
 
+    int puntos;
     int vidas;// vidas, pata logica de colision
     vector<Proyectil> proyectiles; // Almacenar los proyectiles
     Nave(int x, int y, int vidasIniciales);

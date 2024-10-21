@@ -36,7 +36,7 @@ void borrar() {
 }
 
 void dibujarUI(const Nave& nave) {
-    cout << "Vidas: " << nave.vidas << endl; // Mostrar vidas
+    cout << "Vidas: " << nave.vidas<< "                 Puntos: " << nave.puntos << << endl; // Mostrar vidas
     cout << string(40, '-') << endl; // Línea divisoria
 }
 
