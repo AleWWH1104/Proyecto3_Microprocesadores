@@ -20,7 +20,7 @@ void moverAsteroide(Asteroide& asteroide, vector<vector<char>>& pantalla);
 void* ejecutarAsteroide(void* arg);
 void dibujarPantallaAsteroides(const vector<Asteroide>& asteroides, vector<vector<char>>& pantalla);
 
-const char ASTEROIDEC_ASCII = 'o';
+const char ASTEROIDEC_ASCII = 'u';
 
 struct Asteroidec {
     int x, y;

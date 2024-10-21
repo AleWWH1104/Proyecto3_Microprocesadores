@@ -128,7 +128,7 @@ void detectarColisionesProyectilAsteroidesc(Nave& nave, std::vector<Proyectil>& 
         for (Asteroidec& asteroidec : asteroidesc) {
             if (asteroidec.activo && verificarColisionProyectilAsteroidec(proyectil, asteroidec)) {
                 
-                nave.puntos += 100;
+                nave.puntos += 50;
                 asteroidec.activo = false;
                 break;
             }

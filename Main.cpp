@@ -116,6 +116,12 @@ int main() {
 
         // Mover proyectiles
         moverProyectiles(nave.proyectiles);
+
+            for (Asteroidec& asteroidec : asteroidesc) {
+        if (asteroidec.activo) {
+            moverAsteroidec(asteroidec, pantalla);
+            }
+        }
         
         // Dibujar la nave y los asteroides
         dibujarPantallaNave(nave, pantalla); 
@@ -131,7 +137,10 @@ int main() {
         
         detectarColisionesProyectilAsteroides(nave, nave.proyectiles, asteroides, asteroidesc, pantalla);
 
+            detectarColisionesNaveAsteroidesc(nave, asteroidesc);
 
+    // Verificar colisiones entre proyectiles y asteroides pequeños (asteroidesc)
+    detectarColisionesProyectilAsteroidesc(nave, nave.proyectiles, asteroidesc);
 
 
         // Mostrar la pantalla en la consola
