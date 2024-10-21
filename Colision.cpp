@@ -17,7 +17,7 @@ bool verificarColisionNaveAsteroide(const Nave& nave, const Asteroide& asteroide
 void detectarColisionesNaveAsteroides(Nave& nave, vector<Asteroide>& asteroides) {
     for (Asteroide& asteroide : asteroides) {
         if (asteroide.activo && verificarColisionNaveAsteroide(nave, asteroide)) {
-            cout << "¡Colisión detectada entre la nave y un asteroide!" << endl;
+            cout << "Colision detectada entre la nave y un asteroide" << endl;
             
             // Restar una vida al jugador
             nave.vidas--;
@@ -28,7 +28,7 @@ void detectarColisionesNaveAsteroides(Nave& nave, vector<Asteroide>& asteroides)
             //si pierde 
             if (nave.vidas <= 0) {
                 nave.running = false; // Detener el juego si la nave se queda sin vidas
-                cout << "¡Juego terminado! La nave ha sido destruida." << endl;
+                cout << "Juego terminado, La nave ha sido destruida." << endl;
             }
 
             break;  // No es necesario seguir buscando otras colisiones en este ciclo
