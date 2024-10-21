@@ -1,11 +1,12 @@
 #include <iostream>
 #include <pthread.h>
 #include <vector>
-#include <unistd.h>
+#include <chrono>
 #include <cstdlib>
 #include <ctime>
 #include "Nave.h"      // Incluir la cabecera de Nave
 #include "Asteroid.h"  // Incluir la cabecera de Asteroid
+#include <thread> 
 
 #include "Colision.h"
 
@@ -66,7 +67,7 @@ int main() {
             cout << endl; // Nueva línea después de cada fila
         }
 
-        usleep(1000); // Pausa para controlar la velocidad del juego
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 
     // Esperar a que los hilos terminen

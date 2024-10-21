@@ -1,8 +1,10 @@
 #include "Nave.h"
 #include <iostream>
 #include <pthread.h>
-#include <unistd.h>  // Para usar usleep() (esta parte funcionará en Windows si usas MinGW o Cygwin)
+#include <chrono>  // Para usar usleep() (esta parte funcionará en Windows si usas MinGW o Cygwin)
 #include <conio.h>   // Para capturar entrada sin esperar salto de línea
+#include <thread> 
+
 
 using namespace std;  // Añadir aquí
 
@@ -37,7 +39,8 @@ void* ejecutarNave(void* arg) {
             nave->running = false;
         }
 
-        usleep(500);
+        std::this_thread::sleep_for(std::chrono::milliseconds(750));
+
     }
 
     return nullptr;

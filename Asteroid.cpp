@@ -1,8 +1,9 @@
 #include "Asteroid.h"
 #include <iostream>
-#include <unistd.h>
+#include <chrono>
 #include <cstdlib>
 #include <ctime>
+#include <thread> 
 
 using namespace std;  // Añadir aquí
 
@@ -31,7 +32,8 @@ void* ejecutarAsteroide(void* arg) {
     
     while (asteroide->activo) {
         moverAsteroide(*asteroide, pantalla);  // Pasar la pantalla
-        usleep(2000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+;
     }
 
     return nullptr;
