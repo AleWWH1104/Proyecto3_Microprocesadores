@@ -14,6 +14,6 @@ void detectarColisionesNaveAsteroides(Nave& nave, vector<Asteroide>& asteroides)
 
 bool verificarColisionProyectilAsteroide(const Proyectil& proyectil, const Asteroide& asteroide);
 
-void detectarColisionesProyectilAsteroides(Nave& nave, Proyectil& proyectil, vector<Asteroide>& asteroides);
+void detectarColisionesProyectilAsteroides(Nave& nave, std::vector<Proyectil>& proyectiles, std::vector<Asteroide>& asteroides);
 
 #endif // COLISION_H

@@ -11,7 +11,7 @@ using namespace std;  // Añadir aquí
 
 // Constructor para Nave
 Nave::Nave(int x, int y, int vidasIniciales) 
-    : x(x), y(y), direccion(0), running(true), vidas(vidasIniciales) {}
+    : x(x), y(y), direccion(0), running(true), puntos(0), vidas(vidasIniciales) {}
 
 // Función para capturar la entrada del usuario sin esperar un Enter (ya incluida con conio.h)
 void moverNave(Nave& nave, char input) {

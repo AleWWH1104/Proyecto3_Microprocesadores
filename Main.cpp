@@ -36,7 +36,7 @@ void borrar() {
 }
 
 void dibujarUI(const Nave& nave) {
-    cout << "Vidas: " << nave.vidas<< "                 Puntos: " << nave.puntos << << endl; // Mostrar vidas
+    cout << "Vidas: " << nave.vidas<< "                 Puntos: " << nave.puntos << endl; // Mostrar vidas
     cout << string(40, '-') << endl; // Línea divisoria
 }
 
@@ -75,6 +75,7 @@ int main() {
 
     Nave nave(columnas / 2, filas / 2, 3); // Crear la nave en el centro de la pantalla con 3 vidas
     vector<Asteroide> asteroides; // Vector para almacenar los asteroides
+    vector<Proyectil> proyectiles;
 
     // Inicializar algunos asteroides
     for (int i = 0; i < 5; ++i) {
@@ -109,6 +110,11 @@ int main() {
 
         // Verificar colisiones entre la nave y los asteroides
         detectarColisionesNaveAsteroides(nave, asteroides);
+        
+        
+        detectarColisionesProyectilAsteroides(nave, nave.proyectiles, asteroides);
+
+
 
         // Mostrar la pantalla en la consola
         for (const auto& fila : pantalla) {

@@ -43,18 +43,15 @@ bool verificarColisionProyectilAsteroide(const Proyectil& proyectil, const Aster
 }
 
 
-void detectarColisionesProyectilAsteroides(Nave& nave, Proyectil& proyectil, vector<Asteroide>& asteroides) {
-    for (Asteroide& asteroide : asteroides) {
-        if (asteroide.activo && verificarColisionProyectilAsteroide(proyectil, asteroide)) {
-            cout << "Colision detectada entre la proyectil y un asteroide" << endl;
-            
-            // Restar una vida al jugador
-            nave.puntos =  nave.puntos + 100;
-
-            // Desactivar el asteroide (o realizar otra acción, como dividirlo si es grande)
-            asteroide.activo = false;
-
-            break;  // No es necesario seguir buscando otras colisiones en este ciclo
+void detectarColisionesProyectilAsteroides(Nave& nave, std::vector<Proyectil>& proyectiles, std::vector<Asteroide>& asteroides) {
+    for (Proyectil& proyectil : proyectiles) {
+        for (Asteroide& asteroide : asteroides) {
+            if (asteroide.activo && verificarColisionProyectilAsteroide(proyectil, asteroide)) {
+                
+                nave.puntos += 100;
+                asteroide.activo = false;
+                break;
+            }
         }
     }
 }
