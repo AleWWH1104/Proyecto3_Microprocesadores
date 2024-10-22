@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <pthread.h>
 #include <vector>
@@ -7,16 +8,15 @@
 #include "Nave.h"      // Incluir la cabecera de Nave
 #include "Asteroid.h"  // Incluir la cabecera de Asteroid
 #include <thread> 
-
 #include "Colision.h"
 
 using namespace std;
 
 // Tamaño de la pantalla
-const int filas = 20;     // Número de filas
-const int columnas = 40;  // Número de columnas
+int filas = 20;     // Número de filas
+int columnas = 40;  // Número de columnas
 
-// Pantalla donde se dibujan la nave y los asteroides
+// Pantalla donde se dibujan las naves y los asteroides
 vector<vector<char>> pantalla(filas, vector<char>(columnas, ' '));
 
 vector<Asteroide> asteroides; // Declara el vector de asteroides
@@ -37,9 +37,13 @@ void borrar() {
 #endif
 }
 
-void dibujarUI(const Nave& nave) {
-    cout << "Vidas: " << nave.vidas<< "                 Puntos: " << nave.puntos << endl; // Mostrar vidas
-    cout << string(40, '-') << endl; // Línea divisoria
+void dibujarUI(const Nave& nave1, const Nave* nave2 = nullptr) {
+    cout << "Jugador 1 - Vidas: " << nave1.vidas << "  Puntos: " << nave1.puntos;
+    if (nave2) {
+        cout << "   Jugador 2 - Vidas: " << nave2->vidas << "  Puntos: " << nave2->puntos;
+    }
+    cout << endl;
+    cout << string(40, '-') << endl;
 }
 
 void moverProyectiles(vector<Proyectil>& proyectiles) {
@@ -69,29 +73,47 @@ void dibujarProyectiles(const vector<Proyectil>& proyectiles, vector<vector<char
     }
 }
 
-int cantAsteroidesc = asteroides.size() * 2; // Usa el tamaño del vector
-
-
-
-
-
+// Función para seleccionar el modo de juego
+int seleccionarModo() {
+    int opcion;
+    do {
+        cout << "Selecciona el modo de juego:" << endl;
+        cout << "1. Un jugador" << endl;
+        cout << "2. Dos jugadores" << endl;
+        cout << "Opción: ";
+        cin >> opcion;
+    } while (opcion != 1 && opcion != 2);
+    return opcion;
+}
 
 // Función principal del juego
 int main() {
     srand(static_cast<unsigned int>(time(0))); // Semilla para aleatoriedad
 
-    Nave nave(columnas / 2, filas / 2, 3); // Crear la nave en el centro de la pantalla con 3 vidas
-    vector<Asteroide> asteroides; // Vector para almacenar los asteroides
-    vector<Asteroidec> asteroidesc;
+    // Seleccionar el modo de juego
+    int modo = seleccionarModo();
+
+    // Crear naves para los jugadores
+    Nave nave1(columnas / 2, filas / 2, 3);
+    Nave nave2(columnas / 2 - 10, filas / 2, 3); // Segunda nave para el segundo jugador
+
+    bool esMultijugador = (modo == 2);
 
     // Inicializar algunos asteroides
     for (int i = 0; i < 5; ++i) {
         asteroides.emplace_back(rand() % columnas, rand() % filas); // Crear asteroides en posiciones aleatorias
     }
 
-    // Crear hilo para la nave
-    pthread_t hiloNave;
-    pthread_create(&hiloNave, nullptr, ejecutarNave, (void*)&nave);
+    vector<Asteroidec> asteroidesc;
+
+    // Crear hilo para la nave 1
+    pthread_t hiloNave1, hiloNave2;
+    pthread_create(&hiloNave1, nullptr, ejecutarNave, (void*)&nave1);
+
+    // Crear hilo para la nave 2 si el modo es multijugador
+    if (esMultijugador) {
+        pthread_create(&hiloNave2, nullptr, ejecutarNave, (void*)&nave2);
+    }
 
     // Crear hilos para los asteroides
     vector<pthread_t> hilosAsteroides(asteroides.size());
@@ -100,48 +122,61 @@ int main() {
     }
 
     // Crear hilos para los asteroides pequeños
-    vector<pthread_t> hilosAsteroidesc(cantAsteroidesc);
-    for (size_t i = 0; i < cantAsteroidesc; ++i) {
+    vector<pthread_t> hilosAsteroidesc(asteroides.size() * 2);
+    for (size_t i = 0; i < asteroidesc.size(); ++i) {
         pthread_create(&hilosAsteroidesc[i], nullptr, ejecutarAsteroidec, (void*)&asteroidesc[i]);
     }
 
-
     // Bucle principal del juego
-    while (nave.running) {
+    while (nave1.running || (esMultijugador && nave2.running)) {
         borrar();
         limpiarPantalla(); // Limpiar la pantalla
 
         // Dibujar el UI
-        dibujarUI(nave);
+        if (esMultijugador) {
+            dibujarUI(nave1, &nave2);
+        } else {
+            dibujarUI(nave1);
+        }
 
         // Mover proyectiles
-        moverProyectiles(nave.proyectiles);
+        moverProyectiles(nave1.proyectiles);
+        if (esMultijugador) {
+            moverProyectiles(nave2.proyectiles);
+        }
 
-            for (Asteroidec& asteroidec : asteroidesc) {
-        if (asteroidec.activo) {
-            moverAsteroidec(asteroidec, pantalla);
+        // Mover asteroides pequeños
+        for (Asteroidec& asteroidec : asteroidesc) {
+            if (asteroidec.activo) {
+                moverAsteroidec(asteroidec, pantalla);
             }
         }
         
         // Dibujar la nave y los asteroides
-        dibujarPantallaNave(nave, pantalla); 
+        dibujarPantallaNave(nave1, pantalla); 
+        if (esMultijugador) {
+            dibujarPantallaNave(nave2, pantalla);
+        }
+        
         dibujarPantallaAsteroides(asteroides, pantalla);
-        dibujarProyectiles(nave.proyectiles, pantalla); // Dibujar los proyectiles
+        dibujarProyectiles(nave1.proyectiles, pantalla); // Dibujar los proyectiles
+        if (esMultijugador) {
+            dibujarProyectiles(nave2.proyectiles, pantalla); // Dibujar proyectiles de nave2
+        }
 
         dibujarPantallaAsteroidesc(asteroidesc, pantalla);
 
-
         // Verificar colisiones entre la nave y los asteroides
-        detectarColisionesNaveAsteroides(nave, asteroides);
-        
-        
-        detectarColisionesProyectilAsteroides(nave, nave.proyectiles, asteroides, asteroidesc, pantalla);
+        detectarColisionesNaveAsteroides(nave1, esMultijugador ? &nave2 : nullptr, asteroides);
+        if (esMultijugador && nave2.running) { detectarColisionesNaveAsteroides(nave2, nullptr, asteroides); }
 
-            detectarColisionesNaveAsteroidesc(nave, asteroidesc);
+        detectarColisionesProyectilAsteroides(nave1, esMultijugador ? &nave2 : nullptr, nave1.proyectiles, asteroides, asteroidesc, pantalla);
 
-    // Verificar colisiones entre proyectiles y asteroides pequeños (asteroidesc)
-    detectarColisionesProyectilAsteroidesc(nave, nave.proyectiles, asteroidesc);
+        if (esMultijugador) {
+            detectarColisionesProyectilAsteroides(nave2, nullptr, nave2.proyectiles, asteroides, asteroidesc, pantalla);
+        }
 
+        detectarColisionesNaveAsteroidesc(nave1, &nave2, asteroidesc);
 
         // Mostrar la pantalla en la consola
         for (const auto& fila : pantalla) {
@@ -153,8 +188,12 @@ int main() {
 
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
+
     // Esperar a que los hilos terminen
-    pthread_join(hiloNave, nullptr);
+    pthread_join(hiloNave1, nullptr);
+    if (esMultijugador) {
+        pthread_join(hiloNave2, nullptr);
+    }
     for (auto& hilo : hilosAsteroides) {
         pthread_join(hilo, nullptr);
     }

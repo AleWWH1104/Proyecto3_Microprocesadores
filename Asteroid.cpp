@@ -4,8 +4,13 @@
 #include <cstdlib>
 #include <ctime>
 #include <thread> 
+#include "AsteroidsGame.h"
+
 
 using namespace std;  // Añadir aquí
+// Asteroid.cpp
+extern const int filas;
+extern const int columnas;
 
 // Constructor para Asteroide
 Asteroide::Asteroide(int x, int y) : x(x), y(y), activo(true) {}
