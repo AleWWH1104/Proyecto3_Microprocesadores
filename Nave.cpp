@@ -13,124 +13,71 @@ using namespace std;
 Nave::Nave(int x, int y, int vidasIniciales)
     : x(x), y(y), direccion(0), running(true), puntos(0), vidas(vidasIniciales) {}
 
-// Función para disparar un proyectil
-void Nave::disparar() {
-    proyectiles.emplace_back(x, y, direccion);
-}
-
-// Funciones para mover la nave
-void Nave::moverArriba() {
-    if (y > 0) y -= 1;
-}
-
-void Nave::moverAbajo() {
-    if (y < 19) y += 1;
-}
-
-void Nave::moverIzquierda() {
-    if (x > 0) x -= 1;
-}
-
-void Nave::moverDerecha() {
-    if (x < 39) x += 1;
-}
-
-// Función para capturar la entrada del usuario sin esperar un Enter
-void moverNave(Nave& nave, char input) {
+// Función para mover la nave del Jugador 1
+void moverNaveJugador1(Nave& nave, char input) {
     switch (input) {
-        case 'w': 
-            nave.moverArriba(); 
+        case 'w':
+            switch (nave.direccion) {
+                case 0: if (nave.y > 0) nave.y -= 1; break;
+                case 1: if (nave.x < 39) nave.x += 1; break;
+                case 2: if (nave.y < 19) nave.y += 1; break;
+                case 3: if (nave.x > 0) nave.x -= 1; break;
+            }
             break;
-        case 's': 
-            nave.moverAbajo(); 
+        case 'a':
+            nave.direccion = (nave.direccion + 3) % 4; // Gira 90 grados a la izquierda
             break;
-        case 'a': 
-            nave.moverIzquierda(); 
+        case 'd':
+            nave.direccion = (nave.direccion + 1) % 4; // Gira 90 grados a la derecha
             break;
-        case 'd': 
-            nave.moverDerecha(); 
+        case 's':
+            nave.proyectiles.emplace_back(nave.x, nave.y, nave.direccion); // Disparar proyectil
             break;
-        case 'i': 
-            nave.moverArriba(); 
-            break;
-        case 'k': 
-            nave.moverAbajo(); 
-            break;
-        case 'j': 
-            nave.moverIzquierda(); 
-            break;
-        case 'l': 
-            nave.moverDerecha(); 
+        default:
             break;
     }
 }
 
-void dispararProyectil(Nave& nave) {
-    nave.disparar();
+// Función para mover la nave del Jugador 2
+void moverNaveJugador2(Nave& nave, int input) {
+    switch (input) {
+        case 72: // Flecha hacia arriba
+            switch (nave.direccion) {
+                case 0: if (nave.y > 0) nave.y -= 1; break;
+                case 1: if (nave.x < 39) nave.x += 1; break;
+                case 2: if (nave.y < 19) nave.y += 1; break;
+                case 3: if (nave.x > 0) nave.x -= 1; break;
+            }
+            break;
+        case 75: // Flecha hacia la izquierda
+            nave.direccion = (nave.direccion + 3) % 4; // Gira 90 grados a la izquierda
+            break;
+        case 77: // Flecha hacia la derecha
+            nave.direccion = (nave.direccion + 1) % 4; // Gira 90 grados a la derecha
+            break;
+        case 32: // Barra espaciadora para disparar
+            nave.proyectiles.emplace_back(nave.x, nave.y, nave.direccion); // Disparar proyectil
+            break;
+        default:
+            break;
+    }
 }
 
+// Función para ejecutar la lógica de la nave en un hilo
 void* ejecutarNave(void* arg) {
     Nave* nave = (Nave*)arg;
 
     while (nave->running) {
-        char input = getch();
-        moverNave(*nave, input);
-
-        if (input == 'q') {
-            nave->running = false;
+        if (_kbhit()) {
+            char input = _getch();
+            moverNaveJugador1(*nave, input);
         }
-
-        if (input == ' ' || input == 'o') {
-            dispararProyectil(*nave);
-        }
-
         std::this_thread::sleep_for(std::chrono::microseconds(50000));
     }
-
     return nullptr;
 }
 
+// Función para dibujar la nave en la pantalla
 void dibujarPantallaNave(const Nave& nave, vector<vector<char>>& pantalla) {
     pantalla[nave.y][nave.x] = NAVE_ASCII[nave.direccion][0];
-}
-
-
-// Función para manejar la entrada del Jugador 1
-void moverNaveJugador1(Nave& nave, char input) {
-    switch (input) {
-        case 'w': 
-            nave.moverArriba(); 
-            break;
-        case 's': 
-            nave.disparar(); 
-            break;
-        case 'a': 
-            nave.moverIzquierda(); 
-            break;
-        case 'd': 
-            nave.moverDerecha(); 
-            break;
-        default:
-            break;
-    }
-}
-
-// Función para manejar la entrada del Jugador 2
-void moverNaveJugador2(Nave& nave, int input) {
-    switch (input) {
-        case 72:  // Flecha hacia arriba
-            nave.moverArriba(); 
-            break;
-        case 32:  // Barra espaciadora
-            nave.disparar(); 
-            break;
-        case 75:  // Flecha izquierda
-            nave.moverIzquierda(); 
-            break;
-        case 77:  // Flecha derecha
-            nave.moverDerecha(); 
-            break;
-        default:
-            break;
-    }
 }
