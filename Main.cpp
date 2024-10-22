@@ -4,19 +4,19 @@
 #include <chrono>
 #include <cstdlib>
 #include <ctime>
-#include "Nave.h"      // Incluir la cabecera de Nave
-#include "Asteroid.h"  // Incluir la cabecera de Asteroid
+#include "Nave.h"
+#include "Asteroid.h"
 #include <thread> 
 #include "Colision.h"
 
 using namespace std;
 
-const int filas = 20;     // Número de filas
-const int columnas = 40;  // Número de columnas
+const int filas = 20;
+const int columnas = 40;
 
 vector<vector<char>> pantalla(filas, vector<char>(columnas, ' '));
 
-vector<Asteroide> asteroides; // Declara el vector de asteroides
+vector<Asteroide> asteroides;
 
 void limpiarPantalla() {
     for (auto& fila : pantalla) {
@@ -32,8 +32,11 @@ void borrar() {
 #endif
 }
 
-void dibujarUI(const Nave& nave) {
-    cout << "Vidas: " << nave.vidas << "                 Puntos: " << nave.puntos << endl; // Mostrar vidas
+void dibujarUI(const Nave& nave1, const Nave* nave2 = nullptr) {
+    cout << "Jugador 1 - Vidas: " << nave1.vidas << "   Puntos: " << nave1.puntos << endl;
+    if (nave2) {
+        cout << "Jugador 2 - Vidas: " << nave2->vidas << endl;
+    }
     cout << string(40, '-') << endl; // Línea divisoria
 }
 
@@ -41,10 +44,10 @@ void moverProyectiles(vector<Proyectil>& proyectiles) {
     for (auto& proyectil : proyectiles) {  
         if (proyectil.activo) {  
             switch (proyectil.direccion) {
-                case 0: proyectil.y -= 1; break; // Arriba
-                case 1: proyectil.x += 1; break; // Derecha
-                case 2: proyectil.y += 1; break; // Abajo
-                case 3: proyectil.x -= 1; break; // Izquierda
+                case 0: proyectil.y -= 1; break;
+                case 1: proyectil.x += 1; break;
+                case 2: proyectil.y += 1; break;
+                case 3: proyectil.x -= 1; break;
             }
             if (proyectil.y < 0 || proyectil.y >= filas || proyectil.x < 0 || proyectil.x >= columnas) {
                 proyectil.activo = false; // Desactivar si sale de la pantalla
@@ -70,7 +73,6 @@ int main() {
     cout << "Seleccione el modo de juego: 1 para un jugador, 2 para dos jugadores: ";
     cin >> modo;
 
-    // Crear las naves según el modo
     Nave* nave1 = new Nave(columnas / 4, filas / 2, 3, true); // Nave del jugador 1
     Nave* nave2 = nullptr;
 
@@ -105,7 +107,12 @@ int main() {
         borrar();
         limpiarPantalla();
 
-        dibujarUI(*nave1);
+        if (modo == 2) {
+            dibujarUI(*nave1, nave2);
+        } else {
+            dibujarUI(*nave1);
+        }
+        
         moverProyectiles(nave1->proyectiles);
         if (modo == 2) {
             moverProyectiles(nave2->proyectiles);
@@ -146,6 +153,12 @@ int main() {
         detectarColisionesProyectilAsteroidesc(*nave1, nave1->proyectiles, asteroidesc);
         if (modo == 2) {
             detectarColisionesProyectilAsteroidesc(*nave2, nave2->proyectiles, asteroidesc);
+        }
+
+        // Verificar la condición de finalización del juego por puntos
+        if ((modo == 1 && nave1->puntos >= 600) || (modo == 2 && (nave1->puntos + (nave2 ? nave2->puntos : 0)) >= 1000)) {
+            cout << "   YEII, Felicidades. Has alcanzado la puntuacion objetivo. Fin del juego." << endl;
+            break;
         }
 
         for (const auto& fila : pantalla) {

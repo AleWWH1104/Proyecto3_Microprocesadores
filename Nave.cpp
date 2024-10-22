@@ -61,7 +61,7 @@ void* ejecutarNave(void* arg) {
         }
 
         // Diferenciar las teclas de disparo para cada jugador
-        if ((nave->isPlayer1 && input == ' ') || (!nave->isPlayer1 && input == 'o')) { // Espacio para disparar o tecla 'o' para el jugador 2
+        if ((nave->isPlayer1 && input == ' ') || (!nave->isPlayer1 && input == 80)) { // Espacio para disparar o flecha hacia abajo (ASCII 80) para el jugador 2
             dispararProyectil(*nave);
         }
 
