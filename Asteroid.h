@@ -1,4 +1,4 @@
-// Asteroid.h
+
 #ifndef ASTEROID_H
 #define ASTEROID_H
 
@@ -8,10 +8,9 @@ using namespace std;
 
 const char ASTEROIDE_ASCII = 'O';
 
-
 struct Asteroide {
-    int x, y;           
-    bool activo; // Cambiado de atomic<bool> a bool
+    int x, y;
+    bool activo;
 
     Asteroide(int x, int y);
 };
@@ -19,6 +18,7 @@ struct Asteroide {
 void moverAsteroide(Asteroide& asteroide, vector<vector<char>>& pantalla);
 void* ejecutarAsteroide(void* arg);
 void dibujarPantallaAsteroides(const vector<Asteroide>& asteroides, vector<vector<char>>& pantalla);
+bool verificarColisionAsteroide(const Asteroide& asteroide, const Nave& nave1, const Nave& nave2); // Nueva función
 
 const char ASTEROIDEC_ASCII = 'u';
 
@@ -26,12 +26,11 @@ struct Asteroidec {
     int x, y;
     bool activo;
 
-    Asteroidec(int x, int y);  // Constructor que toma dos argumentos
+    Asteroidec(int x, int y);
 };
-
 
 void moverAsteroidec(Asteroidec& asteroidec, vector<vector<char>>& pantalla);
 void* ejecutarAsteroidec(void* arg);
 void dibujarPantallaAsteroidesc(const vector<Asteroidec>& asteroidesc, vector<vector<char>>& pantalla);
 
-#endif 
+#endif

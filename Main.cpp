@@ -5,197 +5,113 @@
 #include <chrono>
 #include <cstdlib>
 #include <ctime>
-#include "Nave.h"      // Incluir la cabecera de Nave
-#include "Asteroid.h"  // Incluir la cabecera de Asteroid
-#include <thread> 
+#include "Nave.h"      
+#include "Asteroid.h"  
+#include <thread>
+
 #include "Colision.h"
 
 using namespace std;
 
 // Tamaño de la pantalla
-int filas = 20;     // Número de filas
-int columnas = 40;  // Número de columnas
+const int filas = 20;     
+const int columnas = 40;  
 
-// Pantalla donde se dibujan las naves y los asteroides
+// Pantalla donde se dibujan la nave y los asteroides
 vector<vector<char>> pantalla(filas, vector<char>(columnas, ' '));
 
-vector<Asteroide> asteroides; // Declara el vector de asteroides
+vector<Asteroide> asteroides; 
 
 // Función para limpiar la pantalla
 void limpiarPantalla() {
     for (auto& fila : pantalla) {
-        fill(fila.begin(), fila.end(), ' '); // Limpiar pantalla
+        fill(fila.begin(), fila.end(), ' '); 
     }
 }
 
-// Función para que se borre todo lo que esta en al pantalla
 void borrar() {
 #ifdef _WIN32
-    system("cls");  // Limpiar pantalla en Windows
+    system("cls");  
 #else
-    system("clear");  // Limpiar pantalla en Linux/Unix
+    system("clear");  
 #endif
 }
 
-void dibujarUI(const Nave& nave1, const Nave* nave2 = nullptr) {
-    cout << "Jugador 1 - Vidas: " << nave1.vidas << "  Puntos: " << nave1.puntos;
-    if (nave2) {
-        cout << "   Jugador 2 - Vidas: " << nave2->vidas << "  Puntos: " << nave2->puntos;
-    }
-    cout << endl;
-    cout << string(40, '-') << endl;
+void dibujarUI(const Nave& nave) {
+    cout << "Vidas: " << nave.vidas << "                 Puntos: " << nave.puntos << endl; 
+    cout << string(40, '-') << endl; 
 }
 
 void moverProyectiles(vector<Proyectil>& proyectiles) {
     for (auto& proyectil : proyectiles) {  
         if (proyectil.activo) {  
-            // Mover el proyectil en la dirección actual
-            switch (proyectil.direccion) {  // Asegúrate de que la dirección esté almacenada en el proyectil
-                case 0: proyectil.y -= 1; break; // Arriba
-                case 1: proyectil.x += 1; break; // Derecha
-                case 2: proyectil.y += 1; break; // Abajo
-                case 3: proyectil.x -= 1; break; // Izquierda
+            switch (proyectil.direccion) {  
+                case 0: proyectil.y -= 1; break; 
+                case 1: proyectil.x += 1; break; 
+                case 2: proyectil.y += 1; break; 
+                case 3: proyectil.x -= 1; break; 
             }
 
-            // Verificar si el proyectil sale de la pantalla
             if (proyectil.y < 0 || proyectil.y >= filas || proyectil.x < 0 || proyectil.x >= columnas) {
-                proyectil.activo = false; // Desactivar si sale de la pantalla
+                proyectil.activo = false; 
             }
         }
     }
 }
 
-void dibujarProyectiles(const vector<Proyectil>& proyectiles, vector<vector<char>>& pantalla) {
-    for (const auto& proyectil : proyectiles) {
-        if (proyectil.activo) {
-            pantalla[proyectil.y][proyectil.x] = '*'; // Representar el proyectil
-        }
+void manejarEntrada(Nave& nave1, Nave& nave2, bool multijugador) {
+    if (multijugador) {
+        // Jugador 1
+        if (cin.get() == 'w') nave1.moverArriba();
+        if (cin.get() == 's') nave1.moverAbajo();
+        if (cin.get() == 'a') nave1.moverIzquierda();
+        if (cin.get() == 'd') nave1.moverDerecha();
+        if (cin.get() == ' ') nave1.disparar();
+
+        // Jugador 2
+        if (cin.get() == 'i') nave2.moverArriba();
+        if (cin.get() == 'k') nave2.moverAbajo();
+        if (cin.get() == 'j') nave2.moverIzquierda();
+        if (cin.get() == 'l') nave2.moverDerecha();
+        if (cin.get() == 'o') nave2.disparar();
+    } else {
+        // Solo Jugador 1
+        if (cin.get() == 'w') nave1.moverArriba();
+        if (cin.get() == 's') nave1.moverAbajo();
+        if (cin.get() == 'a') nave1.moverIzquierda();
+        if (cin.get() == 'd') nave1.moverDerecha();
+        if (cin.get() == ' ') nave1.disparar();
     }
 }
 
-// Función para seleccionar el modo de juego
-int seleccionarModo() {
-    int opcion;
-    do {
-        cout << "Selecciona el modo de juego:" << endl;
-        cout << "1. Un jugador" << endl;
-        cout << "2. Dos jugadores" << endl;
-        cout << "Opción: ";
-        cin >> opcion;
-    } while (opcion != 1 && opcion != 2);
-    return opcion;
-}
-
-// Función principal del juego
 int main() {
-    srand(static_cast<unsigned int>(time(0))); // Semilla para aleatoriedad
+    Nave nave1(1, filas / 2, 3);
+    Nave nave2(2, filas / 2, 3); 
 
-    // Seleccionar el modo de juego
-    int modo = seleccionarModo();
-
-    // Crear naves para los jugadores
-    Nave nave1(columnas / 2, filas / 2, 3);
-    Nave nave2(columnas / 2 - 10, filas / 2, 3); // Segunda nave para el segundo jugador
-
-    bool esMultijugador = (modo == 2);
-
-    // Inicializar algunos asteroides
-    for (int i = 0; i < 5; ++i) {
-        asteroides.emplace_back(rand() % columnas, rand() % filas); // Crear asteroides en posiciones aleatorias
+    bool multijugador = false;
+    char seleccion;
+    cout << "¿Deseas jugar en modo multijugador? (s/n): ";
+    cin >> seleccion;
+    if (seleccion == 's' || seleccion == 'S') {
+        multijugador = true;
     }
 
-    vector<Asteroidec> asteroidesc;
+    while (true) {
+        limpiarPantalla();
+        manejarEntrada(nave1, nave2, multijugador);
 
-    // Crear hilo para la nave 1
-    pthread_t hiloNave1, hiloNave2;
-    pthread_create(&hiloNave1, nullptr, ejecutarNave, (void*)&nave1);
+        nave1.dibujar(pantalla);
+        if (multijugador) nave2.dibujar(pantalla);
 
-    // Crear hilo para la nave 2 si el modo es multijugador
-    if (esMultijugador) {
-        pthread_create(&hiloNave2, nullptr, ejecutarNave, (void*)&nave2);
-    }
+        moverProyectiles(nave1.getProyectiles());
+        if (multijugador) moverProyectiles(nave2.getProyectiles());
 
-    // Crear hilos para los asteroides
-    vector<pthread_t> hilosAsteroides(asteroides.size());
-    for (size_t i = 0; i < asteroides.size(); ++i) {
-        pthread_create(&hilosAsteroides[i], nullptr, ejecutarAsteroide, (void*)&asteroides[i]);
-    }
+        detectarColisionesNaveAsteroides(nave1, nave2, asteroides);
 
-    // Crear hilos para los asteroides pequeños
-    vector<pthread_t> hilosAsteroidesc(asteroides.size() * 2);
-    for (size_t i = 0; i < asteroidesc.size(); ++i) {
-        pthread_create(&hilosAsteroidesc[i], nullptr, ejecutarAsteroidec, (void*)&asteroidesc[i]);
-    }
+        dibujarUI(nave1);
+        if (multijugador) dibujarUI(nave2);
 
-    // Bucle principal del juego
-    while (nave1.running || (esMultijugador && nave2.running)) {
         borrar();
-        limpiarPantalla(); // Limpiar la pantalla
-
-        // Dibujar el UI
-        if (esMultijugador) {
-            dibujarUI(nave1, &nave2);
-        } else {
-            dibujarUI(nave1);
-        }
-
-        // Mover proyectiles
-        moverProyectiles(nave1.proyectiles);
-        if (esMultijugador) {
-            moverProyectiles(nave2.proyectiles);
-        }
-
-        // Mover asteroides pequeños
-        for (Asteroidec& asteroidec : asteroidesc) {
-            if (asteroidec.activo) {
-                moverAsteroidec(asteroidec, pantalla);
-            }
-        }
-        
-        // Dibujar la nave y los asteroides
-        dibujarPantallaNave(nave1, pantalla); 
-        if (esMultijugador) {
-            dibujarPantallaNave(nave2, pantalla);
-        }
-        
-        dibujarPantallaAsteroides(asteroides, pantalla);
-        dibujarProyectiles(nave1.proyectiles, pantalla); // Dibujar los proyectiles
-        if (esMultijugador) {
-            dibujarProyectiles(nave2.proyectiles, pantalla); // Dibujar proyectiles de nave2
-        }
-
-        dibujarPantallaAsteroidesc(asteroidesc, pantalla);
-
-        // Verificar colisiones entre la nave y los asteroides
-        detectarColisionesNaveAsteroides(nave1, esMultijugador ? &nave2 : nullptr, asteroides);
-        if (esMultijugador && nave2.running) { detectarColisionesNaveAsteroides(nave2, nullptr, asteroides); }
-
-        detectarColisionesProyectilAsteroides(nave1, esMultijugador ? &nave2 : nullptr, nave1.proyectiles, asteroides, asteroidesc, pantalla);
-
-        if (esMultijugador) {
-            detectarColisionesProyectilAsteroides(nave2, nullptr, nave2.proyectiles, asteroides, asteroidesc, pantalla);
-        }
-
-        detectarColisionesNaveAsteroidesc(nave1, &nave2, asteroidesc);
-
-        // Mostrar la pantalla en la consola
-        for (const auto& fila : pantalla) {
-            for (char celda : fila) {
-                cout << celda; // Imprimir cada celda
-            }
-            cout << endl; // Nueva línea después de cada fila
-        }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    }
-
-    // Esperar a que los hilos terminen
-    pthread_join(hiloNave1, nullptr);
-    if (esMultijugador) {
-        pthread_join(hiloNave2, nullptr);
-    }
-    for (auto& hilo : hilosAsteroides) {
-        pthread_join(hilo, nullptr);
     }
 
     return 0;

@@ -1,28 +1,39 @@
+
 #ifndef NAVE_H
 #define NAVE_H
 
 #include <vector>
-#include "Proyectil.h"  // Añadir esta línea para declarar el tipo Proyectil
+#include <string>
+#include "Proyectil.h"
+
 using namespace std;
 
-const vector<vector<char>> NAVE_ASCII = {{'^'}, {'>'}, {'v'}, {'<'}};
+const vector<string> NAVE_ASCII = {"A", ">", "V", "<"};
 
 struct Nave {
     int x, y;
-    int direccion;  // 0: Arriba, 1: Derecha, 2: Abajo, 3: Izquierda
+    int direccion;
     bool running;
+
     int puntos;
     int vidas;
-    vector<Proyectil> proyectiles;  // Proyectiles disparados
+    vector<Proyectil> proyectiles;
 
     Nave(int x, int y, int vidasIniciales);
+
+    // Nuevas funciones para movimiento y disparo
+    void disparar();
+    void moverArriba();
+    void moverAbajo();
+    void moverIzquierda();
+    void moverDerecha();
+    void restarVida() { vidas--; }
+    int getX() const { return x; }
+    int getY() const { return y; }
 };
 
-void moverNave(Nave& nave, char input, bool esJugador1);
-void dispararProyectil(Nave& nave);
+void moverNave(Nave& nave, char input);
 void* ejecutarNave(void* arg);
 void dibujarPantallaNave(const Nave& nave, vector<vector<char>>& pantalla);
-void moverProyectiles(vector<Proyectil>& proyectiles);
-void dibujarProyectiles(const vector<Proyectil>& proyectiles, vector<vector<char>>& pantalla);
 
-#endif
+#endif // NAVE_H
