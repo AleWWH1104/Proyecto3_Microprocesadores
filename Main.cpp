@@ -1,4 +1,7 @@
 
+#include <conio.h>
+
+
 #include <iostream>
 #include <pthread.h>
 #include <vector>
@@ -177,4 +180,27 @@ int main() {
     }
 
     return 0;
+}
+
+
+void manejarEntradaJugadores(Nave& nave1, Nave& nave2) {
+    // Capturar entrada para el Jugador 1
+    if (_kbhit()) {
+        char tecla = _getch();
+        moverNaveJugador1(nave1, tecla);
+    }
+    
+    // Capturar entrada para el Jugador 2
+    if (_kbhit()) {
+        int tecla = _getch();
+        moverNaveJugador2(nave2, tecla);
+    }
+}
+
+
+
+void dibujarUI(const Nave& nave1, const Nave& nave2) {
+    cout << "Jugador 1 - Vidas: " << nave1.vidas << "  Puntos: " << nave1.puntos << endl;
+    cout << "Jugador 2 - Vidas: " << nave2.vidas << "  Puntos: " << nave2.puntos << endl;
+    cout << string(40, '-') << endl; 
 }

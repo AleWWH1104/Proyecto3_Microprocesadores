@@ -85,4 +85,3 @@ void dibujarPantallaAsteroidesc(const vector<Asteroidec>& asteroidesc, vector<ve
         }
     }
 }
-    

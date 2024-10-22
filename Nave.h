@@ -37,3 +37,7 @@ void* ejecutarNave(void* arg);
 void dibujarPantallaNave(const Nave& nave, vector<vector<char>>& pantalla);
 
 #endif // NAVE_H
+
+
+void moverNaveJugador1(Nave& nave, char input);
+void moverNaveJugador2(Nave& nave, int input);

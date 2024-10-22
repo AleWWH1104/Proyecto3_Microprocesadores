@@ -93,3 +93,44 @@ void* ejecutarNave(void* arg) {
 void dibujarPantallaNave(const Nave& nave, vector<vector<char>>& pantalla) {
     pantalla[nave.y][nave.x] = NAVE_ASCII[nave.direccion][0];
 }
+
+
+// Función para manejar la entrada del Jugador 1
+void moverNaveJugador1(Nave& nave, char input) {
+    switch (input) {
+        case 'w': 
+            nave.moverArriba(); 
+            break;
+        case 's': 
+            nave.disparar(); 
+            break;
+        case 'a': 
+            nave.moverIzquierda(); 
+            break;
+        case 'd': 
+            nave.moverDerecha(); 
+            break;
+        default:
+            break;
+    }
+}
+
+// Función para manejar la entrada del Jugador 2
+void moverNaveJugador2(Nave& nave, int input) {
+    switch (input) {
+        case 72:  // Flecha hacia arriba
+            nave.moverArriba(); 
+            break;
+        case 32:  // Barra espaciadora
+            nave.disparar(); 
+            break;
+        case 75:  // Flecha izquierda
+            nave.moverIzquierda(); 
+            break;
+        case 77:  // Flecha derecha
+            nave.moverDerecha(); 
+            break;
+        default:
+            break;
+    }
+}

@@ -101,3 +101,29 @@ void detectarColisionesProyectilAsteroidesc(Nave& nave, vector<Proyectil>& proye
         }
     }
 }
+
+
+void detectarColisionesProyectilAsteroides(Nave& nave1, Nave& nave2, vector<Asteroide>& asteroides) {
+    for (Asteroide& asteroide : asteroides) {
+        if (asteroide.activo) {
+            // Verificar colisión con proyectiles de Jugador 1
+            for (auto& proyectil : nave1.proyectiles) {
+                if (proyectil.activo && proyectil.x == asteroide.x && proyectil.y == asteroide.y) {
+                    proyectil.activo = false;
+                    asteroide.activo = false;
+                    nave1.puntos += 10; // Aumentar puntos para Jugador 1
+                    cout << "Jugador 1 ha destruido un asteroide y ha ganado 10 puntos!" << endl;
+                }
+            }
+            // Verificar colisión con proyectiles de Jugador 2
+            for (auto& proyectil : nave2.proyectiles) {
+                if (proyectil.activo && proyectil.x == asteroide.x && proyectil.y == asteroide.y) {
+                    proyectil.activo = false;
+                    asteroide.activo = false;
+                    nave2.puntos += 10; // Aumentar puntos para Jugador 2
+                    cout << "Jugador 2 ha destruido un asteroide y ha ganado 10 puntos!" << endl;
+                }
+            }
+        }
+    }
+}
