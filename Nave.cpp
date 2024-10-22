@@ -7,59 +7,84 @@
 #include <conio.h>
 #include <thread>
 
-using namespace std; 
+using namespace std;
 
 // Constructor para Nave
-Nave::Nave(int x, int y, int vidasIniciales) 
+Nave::Nave(int x, int y, int vidasIniciales)
     : x(x), y(y), direccion(0), running(true), puntos(0), vidas(vidasIniciales) {}
 
-// Función para capturar la entrada del usuario sin esperar un Enter (ya incluida con conio.h)
+// Función para disparar un proyectil
+void Nave::disparar() {
+    proyectiles.emplace_back(x, y, direccion);
+}
+
+// Funciones para mover la nave
+void Nave::moverArriba() {
+    if (y > 0) y -= 1;
+}
+
+void Nave::moverAbajo() {
+    if (y < 19) y += 1;
+}
+
+void Nave::moverIzquierda() {
+    if (x > 0) x -= 1;
+}
+
+void Nave::moverDerecha() {
+    if (x < 39) x += 1;
+}
+
+// Función para capturar la entrada del usuario sin esperar un Enter
 void moverNave(Nave& nave, char input) {
     switch (input) {
-        case 'w': // Jugador 1: Avanzar en la dirección actual
-            switch (nave.direccion) {
-                case 0: if (nave.y > 0) nave.y -= 1; break;
-                case 1: if (nave.x < 39) nave.x += 1; break;
-                case 2: if (nave.y < 19) nave.y += 1; break;
-                case 3: if (nave.x > 0) nave.x -= 1; break;
-            }
+        case 'w': 
+            nave.moverArriba(); 
             break;
-        case 'a': nave.direccion = (nave.direccion + 3) % 4; break; // Girar izquierda
-        case 'd': nave.direccion = (nave.direccion + 1) % 4; break; // Girar derecha
-        case 'i': // Jugador 2: Avanzar en la dirección actual
-            switch (nave.direccion) {
-                case 0: if (nave.y > 0) nave.y -= 1; break;
-                case 1: if (nave.x < 39) nave.x += 1; break;
-                case 2: if (nave.y < 19) nave.y += 1; break;
-                case 3: if (nave.x > 0) nave.x -= 1; break;
-            }
+        case 's': 
+            nave.moverAbajo(); 
             break;
-        case 'j': nave.direccion = (nave.direccion + 3) % 4; break; // Girar izquierda para Jugador 2
-        case 'l': nave.direccion = (nave.direccion + 1) % 4; break; // Girar derecha para Jugador 2
+        case 'a': 
+            nave.moverIzquierda(); 
+            break;
+        case 'd': 
+            nave.moverDerecha(); 
+            break;
+        case 'i': 
+            nave.moverArriba(); 
+            break;
+        case 'k': 
+            nave.moverAbajo(); 
+            break;
+        case 'j': 
+            nave.moverIzquierda(); 
+            break;
+        case 'l': 
+            nave.moverDerecha(); 
+            break;
     }
 }
 
 void dispararProyectil(Nave& nave) {
-    nave.proyectiles.emplace_back(nave.x, nave.y, nave.direccion);
+    nave.disparar();
 }
 
 void* ejecutarNave(void* arg) {
     Nave* nave = (Nave*)arg;
 
     while (nave->running) {
-        char input = getch();  
+        char input = getch();
         moverNave(*nave, input);
 
         if (input == 'q') {
             nave->running = false;
         }
 
-        if (input == ' ' || input == 'o') { // Espacio para Jugador 1, 'o' para Jugador 2
+        if (input == ' ' || input == 'o') {
             dispararProyectil(*nave);
         }
 
         std::this_thread::sleep_for(std::chrono::microseconds(50000));
-
     }
 
     return nullptr;

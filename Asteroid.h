@@ -3,6 +3,7 @@
 #define ASTEROID_H
 
 #include <vector>
+#include "Nave.h"  // Incluir Nave para evitar el error de referencia
 
 using namespace std;
 

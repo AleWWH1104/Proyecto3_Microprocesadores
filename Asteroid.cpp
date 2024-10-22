@@ -1,59 +1,62 @@
-
 #include "Asteroid.h"
-#include "Nave.h"
-#include <iostream>
+#include <vector>
 #include <chrono>
-#include <cstdlib>
-#include <ctime>
-#include <thread> 
+#include <thread>
 
-using namespace std;
 
-// Constructor para Asteroide
 Asteroide::Asteroide(int x, int y) : x(x), y(y), activo(true) {}
 
-void moverAsteroide(Asteroide& asteroide, vector<vector<char>>& pantalla) {
-    if (rand() % 2 == 0) {
-        if (asteroide.x > 0) {
-            asteroide.x -= 1;
-        } else {
-            asteroide.x = pantalla[0].size() - 1; // Si llega al borde, reaparece
-        }
-    } else {
-        if (asteroide.y < pantalla.size() - 1) {
-            asteroide.y += 1;
-        } else {
-            asteroide.y = 0; // Si llega al borde, reaparece
-        }
+void moverAsteroide(Asteroide& asteroide, std::vector<std::vector<char>>& pantalla) {
+    // Lógica para mover el asteroide
+    asteroide.y += 1;
+    if (asteroide.y >= pantalla.size()) {
+        asteroide.activo = false;
     }
 }
 
 void* ejecutarAsteroide(void* arg) {
     Asteroide* asteroide = (Asteroide*)arg;
-    extern vector<vector<char>> pantalla; 
-    
     while (asteroide->activo) {
-        moverAsteroide(*asteroide, pantalla); 
+        // Mover el asteroide y pausar el hilo
+        asteroide->y += 1;
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     return nullptr;
 }
 
-void dibujarPantallaAsteroides(const vector<Asteroide>& asteroides, vector<vector<char>>& pantalla) {
-    for (const auto& asteroide : asteroides) {
-        if (asteroide.activo) {
-            pantalla[asteroide.y][asteroide.x] = ASTEROIDE_ASCII;
+void dibujarPantallaAsteroides(const std::vector<Asteroide>& asteroides, std::vector<std::vector<char>>& pantalla) {
+    for (const Asteroide& asteroide : asteroides) {
+        if (asteroide.activo && asteroide.y < pantalla.size() && asteroide.x < pantalla[0].size()) {
+            pantalla[asteroide.y][asteroide.x] = 'O';
         }
     }
 }
 
-// Nueva función para verificar colisiones con ambas naves
-bool verificarColisionAsteroide(const Asteroide& asteroide, const Nave& nave1, const Nave& nave2) {
-    if (asteroide.activo) {
-        if ((asteroide.x == nave1.getX() && asteroide.y == nave1.getY()) ||
-            (asteroide.x == nave2.getX() && asteroide.y == nave2.getY())) {
-            return true;
+// Definir la lógica de las funciones faltantes para Asteroidec
+Asteroidec::Asteroidec(int x, int y) : x(x), y(y), activo(true) {}
+
+void moverAsteroidec(Asteroidec& asteroidec, std::vector<std::vector<char>>& pantalla) {
+    // Lógica para mover el asteroide pequeño (Asteroidec)
+    asteroidec.y += 1;
+    if (asteroidec.y >= pantalla.size()) {
+        asteroidec.activo = false;
+    }
+}
+
+void* ejecutarAsteroidec(void* arg) {
+    Asteroidec* asteroidec = (Asteroidec*)arg;
+    while (asteroidec->activo) {
+        // Mover el asteroide pequeño y pausar el hilo
+        asteroidec->y += 1;
+        std::this_thread::sleep_for(std::chrono::milliseconds(150));
+    }
+    return nullptr;
+}
+
+void dibujarPantallaAsteroidesc(const std::vector<Asteroidec>& asteroidesc, std::vector<std::vector<char>>& pantalla) {
+    for (const Asteroidec& asteroidec : asteroidesc) {
+        if (asteroidec.activo && asteroidec.y < pantalla.size() && asteroidec.x < pantalla[0].size()) {
+            pantalla[asteroidec.y][asteroidec.x] = 'u';
         }
     }
-    return false;
 }
