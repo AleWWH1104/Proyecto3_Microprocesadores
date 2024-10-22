@@ -1,78 +1,94 @@
-
 #include <iostream>
 #include <pthread.h>
 #include <vector>
 #include <chrono>
 #include <cstdlib>
 #include <ctime>
-#include "Nave.h"      
-#include "Asteroid.h"  
+#include "Nave.h"      // Incluir la cabecera de Nave
+#include "Asteroid.h"  // Incluir la cabecera de Asteroid
 #include <thread> 
 #include "Colision.h"
-#include <conio.h> 
 
 using namespace std;
 
-const int filas = 20;    
-const int columnas = 40;  
+const int filas = 20;     // Número de filas
+const int columnas = 40;  // Número de columnas
 
 vector<vector<char>> pantalla(filas, vector<char>(columnas, ' '));
 
-vector<Asteroide> asteroides; 
+vector<Asteroide> asteroides; // Declara el vector de asteroides
 
 void limpiarPantalla() {
     for (auto& fila : pantalla) {
-        fill(fila.begin(), fila.end(), ' '); 
+        fill(fila.begin(), fila.end(), ' '); // Limpiar pantalla
     }
 }
 
 void borrar() {
 #ifdef _WIN32
-    system("cls");  
+    system("cls");  // Limpiar pantalla en Windows
 #else
-    system("clear");  
+    system("clear");  // Limpiar pantalla en Linux/Unix
 #endif
 }
 
-void dibujarUI(const Nave& nave1, const Nave& nave2, bool multijugador) {
-    if (multijugador) {
-        cout << "Jugador 1 - Vidas: " << nave1.vidas << "  Puntos: " << nave1.puntos << endl;
-        cout << "Jugador 2 - Vidas: " << nave2.vidas << "  Puntos: " << nave2.puntos << endl;
-    } else {
-        cout << "Vidas: " << nave1.vidas << "  Puntos: " << nave1.puntos << endl;
-    }
-    cout << string(40, '-') << endl; 
+void dibujarUI(const Nave& nave) {
+    cout << "Vidas: " << nave.vidas << "                 Puntos: " << nave.puntos << endl; // Mostrar vidas
+    cout << string(40, '-') << endl; // Línea divisoria
 }
 
-void manejarEntradaJugadores(Nave& nave1, Nave& nave2, bool multijugador) {
-    if (_kbhit()) {
-        char tecla = _getch();
-        moverNaveJugador1(nave1, tecla);
-        if (multijugador) {
-            int tecla2 = _getch();
-            moverNaveJugador2(nave2, tecla2);
+void moverProyectiles(vector<Proyectil>& proyectiles) {
+    for (auto& proyectil : proyectiles) {  
+        if (proyectil.activo) {  
+            switch (proyectil.direccion) {
+                case 0: proyectil.y -= 1; break; // Arriba
+                case 1: proyectil.x += 1; break; // Derecha
+                case 2: proyectil.y += 1; break; // Abajo
+                case 3: proyectil.x -= 1; break; // Izquierda
+            }
+            if (proyectil.y < 0 || proyectil.y >= filas || proyectil.x < 0 || proyectil.x >= columnas) {
+                proyectil.activo = false; // Desactivar si sale de la pantalla
+            }
         }
     }
 }
 
-int main() {
-    srand(static_cast<unsigned int>(time(0)));
+void dibujarProyectiles(const vector<Proyectil>& proyectiles, vector<vector<char>>& pantalla) {
+    for (const auto& proyectil : proyectiles) {
+        if (proyectil.activo) {
+            pantalla[proyectil.y][proyectil.x] = '*'; // Representar el proyectil
+        }
+    }
+}
 
-    bool multijugador = false;
-    char modo;
-    cout << "Selecciona el modo de juego (1: Solitario, 2: Multijugador): ";
+int cantAsteroidesc = asteroides.size() * 2;
+
+int main() {
+    srand(static_cast<unsigned int>(time(0))); // Semilla para aleatoriedad
+
+    int modo;
+    cout << "Seleccione el modo de juego: 1 para un jugador, 2 para dos jugadores: ";
     cin >> modo;
-    if (modo == '2') {
-        multijugador = true;
+
+    // Crear las naves según el modo
+    Nave* nave1 = new Nave(columnas / 4, filas / 2, 3, true); // Nave del jugador 1
+    Nave* nave2 = nullptr;
+
+    if (modo == 2) {
+        nave2 = new Nave(columnas * 3 / 4, filas / 2, 3, false); // Nave del jugador 2
     }
 
-    Nave nave1(columnas / 4, filas / 2, 3); 
-    Nave nave2((3 * columnas) / 4, filas / 2, 3); 
+    vector<Asteroide> asteroides;
+    vector<Asteroidec> asteroidesc;
+
+    for (int i = 0; i < 5; ++i) {
+        asteroides.emplace_back(rand() % columnas, rand() % filas); // Crear asteroides en posiciones aleatorias
+    }
 
     pthread_t hiloNave1, hiloNave2;
-    pthread_create(&hiloNave1, nullptr, ejecutarNave, (void*)&nave1);
-    if (multijugador) {
-        pthread_create(&hiloNave2, nullptr, ejecutarNave, (void*)&nave2);
+    pthread_create(&hiloNave1, nullptr, ejecutarNave, (void*)nave1);
+    if (modo == 2) {
+        pthread_create(&hiloNave2, nullptr, ejecutarNave, (void*)nave2);
     }
 
     vector<pthread_t> hilosAsteroides(asteroides.size());
@@ -80,22 +96,61 @@ int main() {
         pthread_create(&hilosAsteroides[i], nullptr, ejecutarAsteroide, (void*)&asteroides[i]);
     }
 
-    while (nave1.running && (!multijugador || nave2.running)) {
+    vector<pthread_t> hilosAsteroidesc(cantAsteroidesc);
+    for (size_t i = 0; i < cantAsteroidesc; ++i) {
+        pthread_create(&hilosAsteroidesc[i], nullptr, ejecutarAsteroidec, (void*)&asteroidesc[i]);
+    }
+
+    while (nave1->running || (modo == 2 && nave2->running)) {
         borrar();
-        limpiarPantalla(); 
+        limpiarPantalla();
 
-        dibujarUI(nave1, nave2, multijugador);
+        dibujarUI(*nave1);
+        moverProyectiles(nave1->proyectiles);
+        if (modo == 2) {
+            moverProyectiles(nave2->proyectiles);
+        }
 
-        manejarEntradaJugadores(nave1, nave2, multijugador); 
+        for (Asteroidec& asteroidec : asteroidesc) {
+            if (asteroidec.activo) {
+                moverAsteroidec(asteroidec, pantalla);
+            }
+        }
 
-        dibujarPantallaNave(nave1, pantalla);
-        if (multijugador) {
-            dibujarPantallaNave(nave2, pantalla);
+        dibujarPantallaNave(*nave1, pantalla); 
+        if (modo == 2) {
+            dibujarPantallaNave(*nave2, pantalla);
+        }
+        dibujarPantallaAsteroides(asteroides, pantalla);
+        dibujarProyectiles(nave1->proyectiles, pantalla); 
+        if (modo == 2) {
+            dibujarProyectiles(nave2->proyectiles, pantalla);
+        }
+        dibujarPantallaAsteroidesc(asteroidesc, pantalla);
+
+        detectarColisionesNaveAsteroides(*nave1, asteroides);
+        if (modo == 2) {
+            detectarColisionesNaveAsteroides(*nave2, asteroides);
+        }
+
+        detectarColisionesProyectilAsteroides(*nave1, nave1->proyectiles, asteroides, asteroidesc, pantalla);
+        if (modo == 2) {
+            detectarColisionesProyectilAsteroides(*nave2, nave2->proyectiles, asteroides, asteroidesc, pantalla);
+        }
+
+        detectarColisionesNaveAsteroidesc(*nave1, asteroidesc);
+        if (modo == 2) {
+            detectarColisionesNaveAsteroidesc(*nave2, asteroidesc);
+        }
+
+        detectarColisionesProyectilAsteroidesc(*nave1, nave1->proyectiles, asteroidesc);
+        if (modo == 2) {
+            detectarColisionesProyectilAsteroidesc(*nave2, nave2->proyectiles, asteroidesc);
         }
 
         for (const auto& fila : pantalla) {
             for (char celda : fila) {
-                cout << celda;
+                cout << celda; 
             }
             cout << endl;
         }
@@ -104,9 +159,15 @@ int main() {
     }
 
     pthread_join(hiloNave1, nullptr);
-    if (multijugador) {
+    if (modo == 2) {
         pthread_join(hiloNave2, nullptr);
     }
+    for (auto& hilo : hilosAsteroides) {
+        pthread_join(hilo, nullptr);
+    }
+
+    delete nave1;
+    if (nave2) delete nave2;
 
     return 0;
 }

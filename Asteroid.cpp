@@ -1,4 +1,3 @@
-
 #include "Asteroid.h"
 #include <iostream>
 #include <chrono>
@@ -10,6 +9,7 @@ using namespace std;  // Añadir aquí
 
 // Constructor para Asteroide
 Asteroide::Asteroide(int x, int y) : x(x), y(y), activo(true) {}
+
 
 void moverAsteroide(Asteroide& asteroide, vector<vector<char>>& pantalla) {
     if (rand() % 2 == 0) {
@@ -34,6 +34,7 @@ void* ejecutarAsteroide(void* arg) {
     while (asteroide->activo) {
         moverAsteroide(*asteroide, pantalla);  // Pasar la pantalla
         std::this_thread::sleep_for(std::chrono::microseconds(350000));
+;
     }
 
     return nullptr;
@@ -47,8 +48,10 @@ void dibujarPantallaAsteroides(const vector<Asteroide>& asteroides, vector<vecto
     }
 }
 
-// Asteroide pequeño (Asteroidec)
+//asteroide chiquito
+
 Asteroidec::Asteroidec(int x, int y) : x(x), y(y), activo(true) {}
+
 
 void moverAsteroidec(Asteroidec& asteroidec, vector<vector<char>>& pantalla) {
     if (rand() % 2 == 0) {
@@ -73,6 +76,7 @@ void* ejecutarAsteroidec(void* arg) {
     while (asteroidec->activo) {
         moverAsteroidec(*asteroidec, pantalla);  // Pasar la pantalla
         std::this_thread::sleep_for(std::chrono::microseconds(350000));
+;
     }
 
     return nullptr;
