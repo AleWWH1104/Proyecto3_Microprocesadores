@@ -58,8 +58,8 @@ void detectarColisionesProyectilAsteroides(Nave& nave, std::vector<Proyectil>& p
     for (Proyectil& proyectil : proyectiles) {
         for (Asteroide& asteroide : asteroides) {
             if (asteroide.activo && verificarColisionProyectilAsteroide(proyectil, asteroide)) {
-                std::cout << "Colisión detectada entre un proyectil y un asteroide" << std::endl;
-                                cout << "Colisión detectada entre un proyectil y un asteroide" << endl;
+                std::cout << "Colision detectada entre un proyectil y un asteroide" << std::endl;
+                                cout << "Colision detectada entre un proyectil y un asteroide" << endl;
 
                 // Incrementar los puntos del jugador
                 nave.puntos += 100;
