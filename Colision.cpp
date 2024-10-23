@@ -100,7 +100,9 @@ void detectarColisionesNaveAsteroidesc(Nave& nave, vector<Asteroidec>& asteroide
             cout << "Colisión detectada entre la nave y un asteroide pequeño" << endl;
             
             // Restar una vida al jugador
-            nave.vidas--;
+            if (nave.running){
+                nave.vidas--;
+            }
 
             // Desactivar el asteroide pequeño
             asteroidec.activo = false;
