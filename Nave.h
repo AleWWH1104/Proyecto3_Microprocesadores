@@ -8,22 +8,27 @@
 
 using namespace std; 
 
+// Constante que almacena la representación ASCII de la nave en diferentes direcciones
 const vector<string> NAVE_ASCII = {"A", ">", "V", "<"}; 
 
+// Estructura que representa una nave en el juego
 struct Nave {
-    int x, y;           
-    int direccion;     
-    bool running;  // Cambiado de atomic<bool> a bool
+    int x;                // Posición X de la nave
+    int y;                // Posición Y de la nave
+    int direccion;        // Dirección en la que está apuntando la nave
+    bool running;         // Indica si la nave está en ejecución
+    int puntos;           // Puntos del jugador
+    int vidas;            // Vidas del jugador
+    vector<Proyectil> proyectiles; // Lista de proyectiles disparados por la nave
+    bool isPlayer1;       // Indica si la nave pertenece al jugador 1
 
-    int puntos;
-    int vidas;// vidas, pata logica de colision
-    vector<Proyectil> proyectiles; // Almacenar los proyectiles
-    bool isPlayer1; // Nueva bandera para indicar si es el jugador 1 o 2
+    // Constructor para inicializar una nave
     Nave(int x, int y, int vidasIniciales, bool isPlayer1);
 };
 
-void moverNave(Nave& nave, char input);
-void* ejecutarNave(void* arg);
-void dibujarPantallaNave(const Nave& nave, vector<vector<char>>& pantalla);
+// Funciones para manejar la nave
+void moverNave(Nave& nave, char input);                     // Mueve la nave según la entrada
+void* ejecutarNave(void* arg);                             // Hilo de ejecución para la nave
+void dibujarPantallaNave(const Nave& nave, vector<vector<char>>& pantalla); // Dibuja la nave en la pantalla
 
 #endif // NAVE_H
