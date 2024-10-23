@@ -35,9 +35,12 @@ void borrar() {
 
 // Función para dibujar la interfaz de usuario
 void dibujarUI(const Nave& nave1, const Nave* nave2 = nullptr) {
-    cout << "Jugador 1 - Vidas: " << nave1.vidas << "   Puntos: " << nave1.puntos << endl;
     if (nave2) {
+        cout << "Jugador 1 - Vidas: " << nave1.vidas << "   Puntos: " << nave1.puntos+nave2->puntos << endl;
         cout << "Jugador 2 - Vidas: " << nave2->vidas << endl;
+    }
+    else{
+        cout << "Jugador 1 - Vidas: " << nave1.vidas << "   Puntos: " << nave1.puntos << endl;
     }
     cout << string(40, '-') << endl; // Línea divisoria
 }
