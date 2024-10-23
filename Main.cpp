@@ -83,7 +83,7 @@ int main() {
     vector<Asteroide> asteroides;
     vector<Asteroidec> asteroidesc;
 
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 10; ++i) {
         asteroides.emplace_back(rand() % columnas, rand() % filas); // Crear asteroides en posiciones aleatorias
     }
 
