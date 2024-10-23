@@ -30,7 +30,7 @@ void detectarColisionesNaveAsteroides(Nave& nave, vector<Asteroide>& asteroides)
     for (Asteroide& asteroide : asteroides) {
         // Verificar si el asteroide está activo y si hay colisión con la nave
         if (asteroide.activo && verificarColisionNaveAsteroide(nave, asteroide)) {
-            cout << "Colisión detectada entre la nave y un asteroide" << endl;
+            cout << "Colision detectada entre la nave y un asteroide" << endl;
             
             // Restar una vida al jugador
             nave.vidas--;
